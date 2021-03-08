@@ -1,43 +1,71 @@
+/**
+ * This class is used to represent a city as a node in the map.
+ * The parent is used to trace back the path.
+ * Since it is an undirected graph loops/cycles
+ * can be an issue, so in order to know if a node has been visited we have a boolean (it will reset to false
+ * after each search).
+ * The arraylist neighbors is the adjacency list for each node.
+ * sld is the straight-line-distance heuristic we have seen in the slides.
+ * @author Danilo Sosa (dgs5678)
+ */
+
+import java.util.ArrayList;
+
 public class Node {
-    private String name, state;
-    private double lat, lon, dist, sld;
+    private String city, state, parent;
+    private double lat, lon, sld;
+    private boolean visited;
+    private ArrayList<String> neighbors;
 
     public Node() {
     }
 
     public Node(String name, String state, double lat, double lon) {
-        this.name = name;
+        this.city = name;
         this.state = state;
         this.lat = lat;
         this.lon = lon;
-        //this.sld = sld;
+        visited = false;
+        neighbors = new ArrayList<>();
     }
 
-    public String getName() {
-        return name;
+    protected String getCity() {
+        return city;
     }
 
-    public String getState() {
-        return state;
+    protected String getParent() {
+        return parent;
     }
 
-    public double getLat() {
+    protected double getLat() {
         return lat;
     }
 
-    public double getLon() {
+    protected double getLon() {
         return lon;
     }
 
-    public double getSld() {
+    protected double getSld() {
         return sld;
     }
 
-    public void setDist(double dist) {
-        this.dist = dist;
+    protected boolean isVisited() {
+        return visited;
     }
 
-    public void setSld(double sld) {
+    protected ArrayList<String> getNeighbors() {
+        return neighbors;
+    }
+
+    protected void setSld(double sld) {
         this.sld = sld;
+    }
+
+    protected void setVisited(boolean visited) {
+        this.visited = visited;
+    }
+
+    protected void setParent(String parent) {
+        this.parent = parent;
     }
 }
