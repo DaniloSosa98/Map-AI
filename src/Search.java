@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -33,6 +32,7 @@ public class Search {
         }
         boolean stdOut= false;
         if(args[1].equals("-")){stdOut = true;}
+
         HashMap<String, Node> nodes = new HashMap<>();
         try {
             FileReader cities = new FileReader("./city.dat");
@@ -71,5 +71,6 @@ public class Search {
             e.printStackTrace();
             System.exit(0);
         }
+        map.showAdj();
     }
 }
