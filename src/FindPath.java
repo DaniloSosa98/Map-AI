@@ -182,26 +182,30 @@ public class FindPath {
             e.printStackTrace();
         }
     }
-
+    /**
+     * This DFS is based off the pseudocode from the Week03-Search slides
+     * However, instead of having a list of closed nodes, we set their
+     * visited boolean as true.
+     */
     public void DFS(){
-        Stack<Node> stack = new Stack<>();
-        prepDFS();
-        stack.add(map.get(start));
-        while(!stack.isEmpty()){
-            Node X = stack.pop();
-            if(X.getCity().equals(destination)){
-                return;
+        Stack<Node> open = new Stack<>();
+        prepDFS();//call method to sort neighbors in des order
+        open.add(map.get(start));//initialize the open stack
+        while(!open.isEmpty()){//while there are states remaining
+            Node X = open.pop();//remove leftmost state from open, call it X
+            if(X.getCity().equals(destination)){//if X is the goal
+                return;//return success
             }else{
-                X.setVisited(true);
-                ArrayList<String> neighbors = X.getNeighbors();
-                for (String neighbor : neighbors) {
-                    if(neighbor.equals(destination)){
-                        map.get(neighbor).setParent(X.getCity());
+                X.setVisited(true);//mark X as visited
+                ArrayList<String> neighbors = X.getNeighbors();//generate children of X
+                for (String neighbor : neighbors) {//go through all children
+                    if(neighbor.equals(destination)){//if any child of X is goal then return
+                        map.get(neighbor).setParent(X.getCity());//used to be able to traceback route
                         return;
-                    }else if(!map.get(neighbor).isVisited()){
-                        map.get(neighbor).setParent(X.getCity());
-                        map.get(neighbor).setVisited(true);
-                        stack.add(map.get(neighbor));
+                    }else if(!map.get(neighbor).isVisited()){//if child is not visited
+                        map.get(neighbor).setParent(X.getCity());//to traceback route
+                        map.get(neighbor).setVisited(true);//set child as visited
+                        open.add(map.get(neighbor));//put remaining children on left end of open
                     }
                 }
             }
