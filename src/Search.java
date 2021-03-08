@@ -22,11 +22,11 @@ public class Search {
             System.exit(0);
         }
         //Declare necessary variables to store input information
-        String start = "", end = "", inputF = "", outputF = "";
-        //If the first argument is '-' the start and end cities will come from stdin
+        String start = "", destination = "", inputF = "", outputF = "";
+        //If the first argument is '-' the start and destination cities will come from stdin
         if(args[0].equals("-")){
             start = sc.nextLine();
-            end = sc.nextLine();
+            destination = sc.nextLine();
         }else{
             //Else the cities will come from an input file,name stored below
             inputF = args[0];
@@ -35,7 +35,7 @@ public class Search {
                 FileReader in = new FileReader("./"+inputF);
                 BufferedReader bufferedReader = new BufferedReader(in);
                 start = bufferedReader.readLine();
-                end = bufferedReader.readLine();
+                destination = bufferedReader.readLine();
             } catch (FileNotFoundException e) {
                 System.err.println("File not found: "+inputF);
                 System.exit(0);
@@ -92,8 +92,18 @@ public class Search {
         } catch (IOException e) {
             System.exit(0);
         }
+        //Check if start city exists, if it doesn't print error and exit
+        if(nodes.get(start)==null){
+            System.err.println("No such city: "+start);
+            System.exit(0);
+        }
+        //Check if destination city exists, if it doesn't print error and exit
+        if(nodes.get(destination)==null){
+            System.err.println("No such city: "+destination);
+            System.exit(0);
+        }
         //Calling the searching algorithms
-        FindPath fp = new FindPath(nodes, start, end);
+        FindPath fp = new FindPath(nodes, start, destination);
         fp.BFS();
         fp.DFS();
         if (stdOut){

@@ -13,12 +13,12 @@ import static java.lang.Math.sqrt;
 
 public class FindPath {
     private HashMap<String,Node> map;
-    private String start, end;
+    private String start, destination;
 
-    public FindPath(HashMap<String, Node> graph, String start, String end) {
+    public FindPath(HashMap<String, Node> graph, String start, String destination) {
         this.map = graph;
         this.start = start;
-        this.end = end;
+        this.destination = destination;
     }
 
     /**
@@ -83,7 +83,7 @@ public class FindPath {
 
     /**
      * This method is used to traceback the route.
-     * It does it by receiving the end node and going
+     * It does it by receiving the destination node and going
      * through the parent nodes until the current node is
      * the start node.
      * @param node
@@ -91,9 +91,9 @@ public class FindPath {
      */
     public ArrayList<String> getRoute(String node){
         ArrayList<String> route = new ArrayList<>();
-        route.add(node); //add end node to route
+        route.add(node); //add destination node to route
         String curr = node; //store current node
-        if (node.equals(start)){//if the end node is the start node
+        if (node.equals(start)){//if the destination node is the start node
             return route;
         }
         curr = map.get(curr).getParent(); //set current as the parent of the last current
@@ -117,13 +117,13 @@ public class FindPath {
         open.add(map.get(start)); //initialize the open queue
         while(!open.isEmpty()){//while there are states remaining
             Node X = open.poll();//remove leftmost state from open, call it X
-            if (X.getCity().equals(end)){//if X is the goal
+            if (X.getCity().equals(destination)){//if X is the goal
                 return;//return success
             }else{
                 X.setVisited(true);//mark X as visited
                 ArrayList<String> neighbors = X.getNeighbors();//generate children of X
                 for (String neighbor : neighbors) {//go through all children
-                    if (neighbor.equals(end)) {//if any child of X is goal then return
+                    if (neighbor.equals(destination)) {//if any child of X is goal then return
                         map.get(neighbor).setParent(X.getCity());//used to be able to traceback route
                         return;
                     }
@@ -144,7 +144,7 @@ public class FindPath {
         double distance = 0;
         System.out.println();
         System.out.println("Breadth-First Search Results: ");
-        ArrayList <String> route = getRoute(end);
+        ArrayList <String> route = getRoute(destination);
         for(int i = 0; i < route.size()-1; i++){
             System.out.println(route.get(i));
             distance += distance(map.get(route.get(i)), map.get(route.get(i+1)));
@@ -168,7 +168,7 @@ public class FindPath {
             bw.newLine();
             bw.write("Breadth-First Search Results: ");
             bw.newLine();
-            ArrayList <String> route = getRoute(end);
+            ArrayList <String> route = getRoute(destination);
             for(int i = 0; i < route.size()-1; i++){
                 bw.write(route.get(i)+"\n");
                 distance += distance(map.get(route.get(i)), map.get(route.get(i+1)));
@@ -189,13 +189,13 @@ public class FindPath {
         stack.add(map.get(start));
         while(!stack.isEmpty()){
             Node X = stack.pop();
-            if(X.getCity().equals(end)){
+            if(X.getCity().equals(destination)){
                 return;
             }else{
                 X.setVisited(true);
                 ArrayList<String> neighbors = X.getNeighbors();
                 for (String neighbor : neighbors) {
-                    if(neighbor.equals(end)){
+                    if(neighbor.equals(destination)){
                         map.get(neighbor).setParent(X.getCity());
                         return;
                     }else if(!map.get(neighbor).isVisited()){
@@ -215,7 +215,7 @@ public class FindPath {
         double total = 0;
         System.out.println();
         System.out.println("Depth-First Search Results:");
-        ArrayList <String> route = getRoute(end);
+        ArrayList <String> route = getRoute(destination);
         for(int i = 0; i < route.size()-1; i++){
             System.out.println(route.get(i));
             total += distance(map.get(route.get(i)), map.get(route.get(i+1)));
@@ -239,7 +239,7 @@ public class FindPath {
             bw.newLine();
             bw.write("\nDepth-First Search Results: ");
             bw.newLine();
-            ArrayList <String> route = getRoute(end);
+            ArrayList <String> route = getRoute(destination);
             for(int i = 0; i < route.size()-1; i++){
                 bw.write(route.get(i)+"\n");
                 distance += distance(map.get(route.get(i)), map.get(route.get(i+1)));
