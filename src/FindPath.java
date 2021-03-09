@@ -29,7 +29,7 @@ public class FindPath {
      * @param n2
      * @return
      */
-    public double distance(Node n1, Node n2) {
+    public double sld(Node n1, Node n2) {
         double lat1, lat2, lon1, lon2;
         lat1 = n1.getLat();
         lat2 = n2.getLat();
@@ -147,7 +147,7 @@ public class FindPath {
         ArrayList <String> route = getRoute(destination);
         for(int i = 0; i < route.size()-1; i++){
             System.out.println(route.get(i));
-            distance += distance(map.get(route.get(i)), map.get(route.get(i+1)));
+            distance += sld(map.get(route.get(i)), map.get(route.get(i+1)));
         }
         System.out.println(route.get(route.size()-1));
         System.out.println("That took " + (route.size()-1) + " hops to find.");
@@ -171,7 +171,7 @@ public class FindPath {
             ArrayList <String> route = getRoute(destination);
             for(int i = 0; i < route.size()-1; i++){
                 bw.write(route.get(i)+"\n");
-                distance += distance(map.get(route.get(i)), map.get(route.get(i+1)));
+                distance += sld(map.get(route.get(i)), map.get(route.get(i+1)));
             }
             bw.write(route.get(route.size()-1)+"\n");
             bw.write("That took " + (route.size()-1) + " hops to find.\n");
@@ -216,17 +216,17 @@ public class FindPath {
      * the sample outputs.
      */
     public void outputDFS(){
-        double total = 0;
+        double distance = 0;
         System.out.println();
         System.out.println("Depth-First Search Results:");
         ArrayList <String> route = getRoute(destination);
         for(int i = 0; i < route.size()-1; i++){
             System.out.println(route.get(i));
-            total += distance(map.get(route.get(i)), map.get(route.get(i+1)));
+            distance += sld(map.get(route.get(i)), map.get(route.get(i+1)));
         }
         System.out.println(route.get(route.size()-1));
         System.out.println("That took " + (route.size()-1) + " hops to find.");
-        System.out.println("Total distance = " + Math.round(total) + " miles.");
+        System.out.println("Total distance = " + Math.round(distance) + " miles.");
         reset();
     }
     /**
@@ -241,12 +241,13 @@ public class FindPath {
             FileWriter fw = new FileWriter("./"+file, true);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.newLine();
-            bw.write("\nDepth-First Search Results: ");
+            bw.newLine();
+            bw.write("Depth-First Search Results: ");
             bw.newLine();
             ArrayList <String> route = getRoute(destination);
             for(int i = 0; i < route.size()-1; i++){
                 bw.write(route.get(i)+"\n");
-                distance += distance(map.get(route.get(i)), map.get(route.get(i+1)));
+                distance += sld(map.get(route.get(i)), map.get(route.get(i+1)));
             }
             bw.write(route.get(route.size()-1)+"\n");
             bw.write("That took " + (route.size()-1) + " hops to find.\n");
@@ -258,6 +259,121 @@ public class FindPath {
         }
     }
 
+    /**
+     * This is similar to what we do in the output of each algorithm,
+     * we are finding g(n) = distance from the start node to the current node
+     * @param node
+     * @return
+     */
+    public double routeWeight(String node){
+        double weight = 0;
+        ArrayList<String> route = getRoute(node);
+        for(int i = 0; i < route.size()-1; i++){
+            weight += sld(map.get(route.get(i)), map.get(route.get(i+1)));
+        }
+        return weight;
+    }
+
+    /**
+     * Like the other prep methods for BFS and DFS, this one sorts
+     * the neighbors by their f(n) = estimated total cost of path through n to goal
+     * @param routes
+     * @param node
+     * @return
+     */
+    public ArrayList<Node> prepAstar(ArrayList<Node> routes, Node node){
+        int size = routes.size();
+        for(int i = 0; i < routes.size(); i++){
+            if(node.getSld() < routes.get(i).getSld()){
+                routes.add(i, node);
+                break;
+            }
+        }
+        if(routes.size() == size)
+            routes.add(node);
+        return routes;
+    }
+
+    /**
+     * We didn't get an A* pseudocode I tried to follow a similar
+     * format as the one we had for BFS and DFS.
+     */
+    public void Astar(){
+        ArrayList<Node> open = new ArrayList<>();
+        //Start by calculating the f(n) of the start node
+        map.get(start).setSld(routeWeight(start) + sld(map.get(destination), map.get(start)));
+        open = prepAstar(open, map.get(start));//initialize the open list
+        while(!open.isEmpty()){//while there are states remaining
+            Node X = open.get(0);//get leftmost state from open, call it X
+            open.remove(0);//remove leftmost state from open
+            if(X.getCity().equals(destination)){//if X is the goal
+                return;//return success
+            }else {
+                X.setVisited(true);//mark X as visited
+                ArrayList<String> neighbors = X.getNeighbors();//generate children of X
+                for (String neighbor : neighbors) {//go through all children
+                    if (neighbor.equals(destination)) {//if any child of X is goal then return
+                        map.get(neighbor).setParent(X.getCity());//used to be able to traceback route
+                        return;
+                    }
+                    else if(!map.get(neighbor).isVisited()){//if child is not visited
+                        map.get(neighbor).setParent(X.getCity());//to traceback route
+                        map.get(neighbor).setVisited(true);//set child as visited
+                        map.get(start).setSld(routeWeight(neighbor) + sld(map.get(destination), map.get(neighbor)));//update f(n)
+                        open = prepAstar(open, map.get(neighbor));//put remaining children on left end of open
+
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * This prints the results of A* to stdout with the exact format of
+     * the sample outputs.
+     */
+    public void outputAstar(){
+        double distance = 0;
+        System.out.println();
+        System.out.println("A* Search Results: ");
+        ArrayList <String> path = getRoute(destination);
+        for(int i = 0; i < path.size()-1; i++){
+            System.out.println(path.get(i));
+            distance += sld(map.get(path.get(i)), map.get(path.get(i+1)));
+        }
+        System.out.println(path.get(path.size()-1));
+        System.out.println("That took " + (path.size()-1) + " hops to find.");
+        System.out.println("Total distance = " + Math.round(distance) +" miles.");
+    }
+    /**
+     * This receives the output file name and writes to it.
+     * Since the file was created and written-to by BFS output, the A*
+     * output will be appended.
+     * @param file
+     */
+    public void outputAstar(String file){
+        double distance = 0;
+        try {
+            FileWriter fw = new FileWriter("./"+file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.newLine();
+            bw.newLine();
+            bw.write("A* Search Results: ");
+            bw.newLine();
+            ArrayList <String> route = getRoute(destination);
+            for(int i = 0; i < route.size()-1; i++){
+                bw.write(route.get(i)+"\n");
+                distance += sld(map.get(route.get(i)), map.get(route.get(i+1)));
+            }
+            bw.write(route.get(route.size()-1)+"\n");
+            bw.write("That took " + (route.size()-1) + " hops to find.\n");
+            bw.write("Total distance = " + Math.round(distance) +" miles.\n");
+            bw.newLine();
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * This method sets all nodes visited boolean as false.
      * It is called after BFS and DFS.

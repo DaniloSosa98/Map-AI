@@ -104,23 +104,30 @@ public class Search {
         }
         //Calling the searching algorithms
         FindPath fp = new FindPath(nodes, start, destination);
-        fp.BFS();
-        fp.DFS();
         if (stdOut){
+            fp.BFS();
             fp.outputBFS();
+
+            fp.DFS();
             fp.outputDFS();
+
+            fp.Astar();
+            fp.outputAstar();
         }else{
             File f = new File("./" + outputF);
             try {
-                if(f.createNewFile()){
-                }else{
-                    System.out.println("File already exists");
-                }
+                f.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            fp.BFS();
             fp.outputBFS(outputF);
+
+            fp.DFS();
             fp.outputDFS(outputF);
+
+            fp.Astar();
+            fp.outputAstar(outputF);
         }
     }
 }
